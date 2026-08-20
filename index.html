@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mumbai Local Train Timetable</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #6C4DFF; --bg: #F7F5FF; --dark: #17142B; }
+        * { box-sizing: border-box; margin:0; padding:0; font-family:'Plus Jakarta Sans',sans-serif; }
+        body { background: var(--bg); color: var(--dark); padding-bottom: 50px; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 16px; }
+        header { background: var(--primary); color: #fff; padding: 15px 0; position: sticky; top:0; z-index:100; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { color:#fff; text-decoration:none; font-weight:800; font-size:1.1rem; }
+        .nav-links { display:flex; gap:12px; list-style:none; }
+        .nav-links a { color:#fff; text-decoration:none; font-size:0.85rem; font-weight:600; }
+        .hero { background: var(--dark); color:#fff; padding: 30px 16px; text-align:center; }
+        .search-card { background:#fff; border-radius:16px; padding:20px; margin-top:-25px; box-shadow:0 10px 25px rgba(0,0,0,0.1); }
+        .form-group { position:relative; margin-bottom:12px; }
+        .form-group label { font-size:0.75rem; font-weight:800; color:var(--primary); display:block; margin-bottom:4px; }
+        .input-field { width:100%; padding:12px; border:2px solid #E5E7EB; border-radius:10px; font-weight:600; outline:none; }
+        .dropdown { position:absolute; top:100%; left:0; right:0; background:#fff; border:2px solid var(--primary); border-radius:10px; z-index:999; display:none; max-height:180px; overflow-y:auto; box-shadow:0 10px 20px rgba(0,0,0,0.15); }
+        .dropdown-item { padding:10px 14px; font-weight:700; cursor:pointer; border-bottom:1px solid #eee; }
+        .dropdown-item:hover { background:var(--bg); color:var(--primary); }
+        .btn { width:100%; background:var(--primary); color:#fff; border:none; padding:14px; border-radius:10px; font-weight:800; cursor:pointer; font-size:1rem; margin-top:8px; }
+        .section-title { margin:24px 0 12px; font-weight:800; }
+        .line-tabs { display:flex; gap:8px; overflow-x:auto; margin-bottom:12px; }
+        .tab-btn { padding:8px 16px; background:#fff; border:1px solid #ddd; border-radius:20px; font-weight:700; font-size:0.8rem; cursor:pointer; white-space:nowrap; }
+        .tab-btn.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+        .chips { display:flex; flex-wrap:wrap; gap:8px; background:#fff; padding:12px; border-radius:12px; }
+        .chip { background:var(--bg); padding:6px 12px; border-radius:16px; font-size:0.8rem; font-weight:600; cursor:pointer; }
+        .train-card { background:#fff; border-radius:12px; padding:16px; margin-bottom:12px; box-shadow:0 2px 5px rgba(0,0,0,0.05); }
+        .pf-badge { background:#FEF3C7; color:#B45309; font-weight:800; padding:3px 8px; border-radius:6px; font-size:0.8rem; display:inline-block; margin-top:6px; }
+        .time-row { display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-content">
+            <a href="#" class="logo">🚆 Mumbai Local</a>
+            <ul class="nav-links">
+                <li><a href="#search">Home</a></li>
+                <li><a href="#lines">Lines</a></li>
+                <li><a href="#planner">Planner</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="hero">
+        <h2>Mumbai Local Timetable</h2>
+        <p style="font-size:0.85rem; color:#ccc;">Select stations to view platform & timings</p>
+    </div>
+
+    <div class="container" id="search">
+        <div class="search-card">
+            <div class="form-group">
+                <label>FROM STATION</label>
+                <input type="text" id="from-input" class="input-field" placeholder="Type station (e.g. CSMT)..." autocomplete="off">
+                <div id="from-dd" class="dropdown"></div>
+            </div>
+            <div class="form-group">
+                <label>TO STATION</label>
+                <input type="text" id="to-input" class="input-field" placeholder="Type station (e.g. Dadar)..." autocomplete="off">
+                <div id="to-dd" class="dropdown"></div>
+            </div>
+            <button class="btn" onclick="searchTrains()">Find Trains</button>
+        </div>
+
+        <div id="lines">
+            <h3 class="section-title">Select Line</h3>
+            <div class="line-tabs">
+                <button class="tab-btn active" onclick="loadChips('central', this)">CENTRAL</button>
+                <button class="tab-btn" onclick="loadChips('western', this)">WESTERN</button>
+                <button class="tab-btn" onclick="loadChips('harbour', this)">HARBOUR</button>
+            </div>
+            <div class="chips" id="chip-box"></div>
+        </div>
+
+        <div>
+            <h3 class="section-title">Available Trains & Platforms</h3>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        const data = {
+            central: ["CSMT", "Byculla", "Dadar", "Kurla", "Ghatkopar", "Thane", "Dombivli", "Kalyan"],
+            western: ["Churchgate", "Mumbai Central", "Dadar", "Bandra", "Andheri", "Borivali", "Virar"],
+            harbour: ["CSMT", "Wadala Road", "Kurla", "Vashi", "Nerul", "Panvel"]
+        };
+
+        const allSt = [...new Set([...data.central, ...data.western, ...data.harbour])].sort();
+
+        const trains = [
+            { name: "CSMT - Kalyan Fast", type: "FAST", pf: "PF No. 5", time: "09:10 AM - 10:18 AM" },
+            { name: "CSMT - Thane Slow", type: "SLOW", pf: "PF No. 2", time: "09:15 AM - 10:12 AM" },
+            { name: "Churchgate - Borivali AC", type: "AC FAST", pf: "PF No. 3", time: "09:05 AM - 09:55 AM" }
+        ];
+
+        window.onload = () => {
+            loadChips('central');
+            setupSearch('from-input', 'from-dd');
+            setupSearch('to-input', 'to-dd');
+            renderResults();
+        };
+
+        function loadChips(line, btn) {
+            if(btn) {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            document.getElementById('chip-box').innerHTML = data[line].map(s => `<span class="chip" onclick="fillSt('${s}')">${s}</span>`).join('');
+        }
+
+        function fillSt(s) {
+            const f = document.getElementById('from-input');
+            const t = document.getElementById('to-input');
+            if(!f.value) f.value = s; else t.value = s;
+        }
+
+        function setupSearch(inpId, ddId) {
+            const inp = document.getElementById(inpId);
+            const dd = document.getElementById(ddId);
+            inp.oninput = () => {
+                const val = inp.value.toLowerCase().trim();
+                if(!val) { dd.style.display = 'none'; return; }
+                const matches = allSt.filter(s => s.toLowerCase().includes(val));
+                if(!matches.length) { dd.style.display = 'none'; return; }
+                dd.innerHTML = matches.map(s => `<div class="dropdown-item" onclick="selectSt('${inpId}','${ddId}','${s}')">${s}</div>`).join('');
+                dd.style.display = 'block';
+            };
+        }
+
+        function selectSt(inpId, ddId, val) {
+            document.getElementById(inpId).value = val;
+            document.getElementById(ddId).style.display = 'none';
+        }
+
+        function renderResults() {
+            document.getElementById('results').innerHTML = trains.map(t => `
+                <div class="train-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h4>${t.name}</h4>
+                        <span style="font-size:0.75rem; font-weight:800; color:var(--primary);">${t.type}</span>
+                    </div>
+                    <span class="pf-badge">🚉 Platform: ${t.pf}</span>
+                    <div class="time-row">
+                        <span style="font-weight:700;">${t.time}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function searchTrains() {
+            renderResults();
+            alert('Trains updated with platform numbers!');
+        }
+    </script>
+</body>
+</html>
+
