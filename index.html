@@ -3,88 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mumbai Local Live Route</title>
+    <title>Mumbai Local Live Route Planner</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #6C4DFF; --bg: #F7F5FF; --dark: #17142B; }
         * { box-sizing: border-box; margin:0; padding:0; font-family:'Plus Jakarta Sans',sans-serif; }
         body { background: var(--bg); color: var(--dark); padding-bottom: 50px; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 0 16px; }
-        header { background: var(--primary); color: #fff; padding: 15px 0; }
-        .hero { background: var(--dark); color:#fff; padding: 20px 16px; text-align:center; }
+        .container { max-width: 600px; margin: 0 auto; padding: 0 16px; }
+        header { background: var(--primary); color: #fff; padding: 15px 0; position: sticky; top:0; z-index:100; }
+        .hero { background: var(--dark); color:#fff; padding: 25px 16px; text-align:center; }
         .search-card { background:#fff; border-radius:16px; padding:20px; margin-top:-25px; box-shadow:0 10px 25px rgba(0,0,0,0.1); }
-        .input-field { width:100%; padding:12px; border:2px solid #E5E7EB; border-radius:10px; font-weight:600; margin-bottom:10px; }
-        .btn { width:100%; background:var(--primary); color:#fff; border:none; padding:14px; border-radius:10px; font-weight:800; cursor:pointer; }
-        .train-card { background:#fff; border-radius:12px; padding:16px; margin-bottom:12px; box-shadow:0 2px 5px rgba(0,0,0,0.05); cursor:pointer; }
+        .input-field { width:100%; padding:14px; border:2px solid #E5E7EB; border-radius:12px; font-weight:600; margin-bottom:12px; font-size:1rem; }
+        .btn { width:100%; background:var(--primary); color:#fff; border:none; padding:15px; border-radius:12px; font-weight:800; cursor:pointer; font-size:1rem; }
         
-        /* Interactive Route */
-        .route-timeline { margin-top:16px; padding-top:16px; border-top:1px dashed #E5E7EB; display:none; }
+        .train-card { background:#fff; border-radius:12px; padding:16px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.08); cursor:pointer; border-left: 5px solid var(--primary); }
+        .train-card h4 { margin-bottom:4px; font-size:1.1rem; }
+        .pf-badge { background:#FEF3C7; color:#B45309; font-weight:800; padding:2px 8px; border-radius:6px; font-size:0.75rem; }
+        
+        .route-timeline { display:none; margin-top:16px; padding-top:16px; border-top:1px dashed #DDD; }
         .route-timeline.active { display:block; }
-        .stop-item { display:flex; justify-content:space-between; padding:6px 0 6px 24px; position:relative; }
-        .stop-item::before { content:''; position:absolute; left:6px; top:12px; width:10px; height:10px; border-radius:50%; background:#9CA3AF; }
-        .stop-item.current::before { background:#10B981; }
-        .stop-item.passed .st-name { color:#9CA3AF; text-decoration:line-through; }
-        .tag-passed { font-size:0.65rem; background:#E5E7EB; color:#444; padding:2px 6px; border-radius:4px; }
+        .stop-item { display:flex; justify-content:space-between; align-items:center; padding:8px 0 8px 20px; position:relative; border-left: 2px solid #E5E7EB; margin-left:6px; }
+        .stop-item::before { content:''; position:absolute; left:-6px; top:12px; width:10px; height:10px; border-radius:50%; background:#9CA3AF; }
+        .stop-item.passed { color:#9CA3AF; }
+        .stop-item.passed .st-name { text-decoration: line-through; }
+        .stop-item.current { color:var(--primary); font-weight:800; }
+        .stop-item.current::before { background:var(--primary); box-shadow:0 0 0 4px rgba(108, 77, 255, 0.2); }
+        .tag { font-size:0.6rem; padding:2px 6px; border-radius:4px; font-weight:800; text-transform:uppercase; margin-left:8px; }
     </style>
 </head>
 <body>
 
-    <header><div class="container"><h3>🚆 Mumbai Local Live</h3></div></header>
+    <header><div class="container"><strong>🚆 Mumbai Local Live</strong></div></header>
 
     <div class="hero"><h2>Live Route Planner</h2></div>
 
     <div class="container">
         <div class="search-card">
-            <input type="text" id="from-input" class="input-field" placeholder="From Station">
-            <input type="text" id="to-input" class="input-field" placeholder="To Station">
+            <input type="text" id="from-input" class="input-field" placeholder="From (e.g. Borivali)">
+            <input type="text" id="to-input" class="input-field" placeholder="To (e.g. Churchgate)">
             <button class="btn" onclick="searchTrains()">Find Trains</button>
         </div>
 
-        <h3 id="results-title" style="margin:20px 0;"></h3>
-        <div id="results"></div>
+        <div id="results" style="margin-top:20px;"></div>
     </div>
 
     <script>
         const data = {
-            central: ["CSMT", "Masjid", "Sandhurst Road", "Byculla", "Dadar", "Kurla", "Ghatkopar", "Thane", "Dombivli", "Kalyan"],
+            central: ["CSMT", "Masjid", "Sandhurst Road", "Byculla", "Parel", "Dadar", "Kurla", "Ghatkopar", "Thane", "Dombivli", "Kalyan"],
             western: ["Churchgate", "Marine Lines", "Mumbai Central", "Dadar", "Bandra", "Andheri", "Borivali", "Bhayandar", "Vasai Road", "Virar"],
             harbour: ["CSMT", "Masjid", "Sandhurst Road", "Wadala Road", "Kurla", "Chembur", "Govandi", "Vashi", "Panvel"]
         };
+
+        function getLiveTime(minutesOffset) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + minutesOffset);
+            return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
 
         function searchTrains() {
             const from = document.getElementById('from-input').value.trim();
             const to = document.getElementById('to-input').value.trim();
             
-            // Auto-detect Line
-            let line = 'western'; // default
+            // Find line
+            let line = 'western';
             if(data.central.includes(from)) line = 'central';
-            if(data.harbour.includes(from)) line = 'harbour';
-            
-            document.getElementById('results-title').innerText = `Routes: ${from} to ${to}`;
+            else if(data.harbour.includes(from)) line = 'harbour';
 
-            // Generate Logic for Timeline
-            const stops = data[line] || data.western;
-            const fromIdx = stops.indexOf(from);
-            const toIdx = stops.indexOf(to);
-            
-            // Subset of route
-            const route = stops.slice(Math.min(fromIdx, toIdx), Math.max(fromIdx, toIdx) + 1);
-            if(fromIdx > toIdx) route.reverse();
+            const stops = data[line];
+            const start = stops.indexOf(from);
+            const end = stops.indexOf(to);
 
-            const trains = ["Fast Local", "Slow Local"];
-            
-            document.getElementById('results').innerHTML = trains.map((t, idx) => `
+            if(start === -1 || end === -1) { alert("Station not found in this line!"); return; }
+
+            // Direction Logic
+            let route = [];
+            if(start < end) route = stops.slice(start, end + 1);
+            else route = stops.slice(end, start + 1).reverse();
+
+            document.getElementById('results').innerHTML = ["Fast Local", "Slow Local"].map((t, idx) => `
                 <div class="train-card" onclick="this.querySelector('.route-timeline').classList.toggle('active')">
-                    <h4>${from} - ${to} ${t}</h4>
-                    <p style="font-size:0.8rem; color:#666;">Tap to view route</p>
+                    <div style="display:flex; justify-content:space-between;">
+                        <h4>${from} - ${to} ${t}</h4>
+                        <span class="pf-badge">PF ${idx + 1}</span>
+                    </div>
+                    <p style="font-size:0.8rem; color:#888;">Tap for route details</p>
+                    
                     <div class="route-timeline">
                         ${route.map((s, i) => {
-                            let statusClass = i === 0 ? "current" : "upcoming";
-                            let tag = i === 0 ? "Boarding" : "";
+                            const time = getLiveTime(i * 5 + idx * 10);
+                            const isPassed = i < (route.length/2); // Logic for demo
                             return `
-                                <div class="stop-item ${statusClass}">
-                                    <span class="st-name">${s} ${tag ? `<span class="tag-passed" style="background:#10B981; color:white;">${tag}</span>` : ''}</span>
-                                    <span>12:${15 + (i*5)} PM</span>
+                                <div class="stop-item ${isPassed ? 'passed' : 'current'}">
+                                    <span class="st-name">${s} ${isPassed ? '<span class="tag" style="background:#EEE">Passed</span>' : '<span class="tag" style="background:#6C4DFF; color:white;">Upcoming</span>'}</span>
+                                    <small>${time}</small>
                                 </div>
                             `;
                         }).join('')}
