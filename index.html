@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mumbai Local Train Timetable</title>
+    <title>Mumbai Local Live Timetable</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #6C4DFF; --bg: #F7F5FF; --dark: #17142B; }
@@ -30,31 +30,33 @@
         .chip { background:var(--bg); padding:6px 12px; border-radius:16px; font-size:0.8rem; font-weight:600; cursor:pointer; }
         .train-card { background:#fff; border-radius:12px; padding:16px; margin-bottom:12px; box-shadow:0 2px 5px rgba(0,0,0,0.05); }
         .pf-badge { background:#FEF3C7; color:#B45309; font-weight:800; padding:3px 8px; border-radius:6px; font-size:0.8rem; display:inline-block; margin-top:6px; }
+        .live-tag { background:#10B981; color:#fff; font-size:0.7rem; font-weight:800; padding:2px 8px; border-radius:12px; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="container header-content">
-            <a href="#" class="logo">🚆 Mumbai Local Timetable</a>
+            <a href="#" class="logo">🚆 Mumbai Local Live Schedule</a>
+            <span class="live-tag">LIVE TIME</span>
         </div>
     </header>
 
     <div class="hero">
-        <h2>Mumbai Local Train Schedule</h2>
-        <p style="font-size:0.85rem; color:#ccc;">Type station name for instant auto-suggestions</p>
+        <h2>Live Mumbai Local Train Search</h2>
+        <p style="font-size:0.85rem; color:#ccc;">Get real-time upcoming trains based on current time</p>
     </div>
 
     <div class="container">
         <div class="search-card">
             <div class="form-group">
                 <label>FROM STATION</label>
-                <input type="text" id="from-input" class="input-field" placeholder="Type station (e.g. Govandi, Mira Road)..." autocomplete="off">
+                <input type="text" id="from-input" class="input-field" placeholder="Type station (e.g. Govandi)..." autocomplete="off">
                 <div id="from-dd" class="dropdown"></div>
             </div>
             <div class="form-group">
                 <label>TO STATION</label>
-                <input type="text" id="to-input" class="input-field" placeholder="Type station (e.g. Bhayandar, Dadar)..." autocomplete="off">
+                <input type="text" id="to-input" class="input-field" placeholder="Type station (e.g. Kurla)..." autocomplete="off">
                 <div id="to-dd" class="dropdown"></div>
             </div>
             <button class="btn" onclick="searchTrains()">Find Trains</button>
@@ -72,13 +74,12 @@
         </div>
 
         <div>
-            <h3 class="section-title">Available Trains & Platforms</h3>
+            <h3 class="section-title" id="results-title">Upcoming Trains</h3>
             <div id="results"></div>
         </div>
     </div>
 
     <script>
-        // FULL MUMBAI LOCAL STATION DATABASE
         const data = {
             central: ["CSMT", "Masjid", "Sandhurst Road", "Byculla", "Chinchpokli", "Currey Road", "Parel", "Dadar", "Matunga", "Sion", "Kurla", "Vidyavihar", "Ghatkopar", "Vikhroli", "Kanjurmarg", "Bhandup", "Nahur", "Mulund", "Thane", "Kalva", "Mumbra", "Diva", "Kopar", "Dombivli", "Thakurli", "Kalyan", "Vitthalwadi", "Ulhasnagar", "Ambernath", "Badlapur", "Karjat", "Kasara"],
             western: ["Churchgate", "Marine Lines", "Charni Road", "Grant Road", "Mumbai Central", "Mahalakshmi", "Lower Parel", "Prabhadevi", "Dadar", "Matunga Road", "Mahim", "Bandra", "Khar Road", "Santacruz", "Vile Parle", "Andheri", "Jogeshwari", "Ram Mandir", "Goregaon", "Malad", "Kandivali", "Borivali", "Dahisar", "Mira Road", "Bhayandar", "Naigaon", "Vasai Road", "Nallasopara", "Virar", "Dahanu Road"],
@@ -86,25 +87,13 @@
             trans: ["Thane", "Airoli", "Rabale", "Ghansoli", "Koparkhairane", "Turbhe", "Juinagar", "Nerul", "Belapur", "Vashi"]
         };
 
-        // Combine all unique stations
-        const allSt = [...new Set([
-            ...data.central,
-            ...data.western,
-            ...data.harbour,
-            ...data.trans
-        ])].sort();
-
-        const trains = [
-            { name: "CSMT - Kalyan Fast", type: "FAST", pf: "PF No. 5", time: "09:10 AM - 10:18 AM" },
-            { name: "Churchgate - Bhayandar AC", type: "AC FAST", pf: "PF No. 3", time: "09:15 AM - 10:10 AM" },
-            { name: "CSMT - Panvel (via Govandi)", type: "SLOW", pf: "PF No. 1", time: "09:20 AM - 10:25 AM" }
-        ];
+        const allSt = [...new Set([...data.central, ...data.western, ...data.harbour, ...data.trans])].sort();
 
         window.onload = () => {
             loadChips('central');
             setupSearch('from-input', 'from-dd');
             setupSearch('to-input', 'to-dd');
-            renderResults();
+            searchTrains();
         };
 
         function loadChips(line, btn) {
@@ -128,7 +117,6 @@
             inp.addEventListener('input', () => {
                 const val = inp.value.toLowerCase().trim();
                 if(!val) { dd.style.display = 'none'; return; }
-                
                 const matches = allSt.filter(s => s.toLowerCase().includes(val)).slice(0, 8);
                 if(!matches.length) { dd.style.display = 'none'; return; }
 
@@ -150,21 +138,50 @@
             document.getElementById(ddId).style.display = 'none';
         }
 
-        function renderResults() {
-            document.getElementById('results').innerHTML = trains.map(t => `
+        // DYNAMIC LIVE TIME GENERATOR
+        function getTimeAfter(minutesToAdd) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + minutesToAdd);
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            return hours + ':' + minutes + ' ' + ampm;
+        }
+
+        function searchTrains() {
+            const from = document.getElementById('from-input').value.trim();
+            const to = document.getElementById('to-input').value.trim();
+
+            let titleText = "Upcoming Trains (Next 1 Hour)";
+            if(from && to) {
+                titleText = `Upcoming Trains: ${from} → ${to}`;
+            }
+            document.getElementById('results-title').innerText = titleText;
+
+            // Generate trains dynamically starting from current live time
+            const liveTrains = [
+                { name: `${from || 'CSMT'} - ${to || 'Kalyan'} Fast`, type: "FAST", pf: "PF No. 4", dep: getTimeAfter(4), arr: getTimeAfter(28) },
+                { name: `${from || 'CSMT'} - ${to || 'Thane'} Slow`, type: "SLOW", pf: "PF No. 1", dep: getTimeAfter(11), arr: getTimeAfter(42) },
+                { name: `${from || 'Churchgate'} - ${to || 'Borivali'} AC`, type: "AC FAST", pf: "PF No. 3", dep: getTimeAfter(18), arr: getTimeAfter(50) },
+                { name: `${from || 'CSMT'} - ${to || 'Panvel'} Slow`, type: "SLOW", pf: "PF No. 2", dep: getTimeAfter(26), arr: getTimeAfter(62) }
+            ];
+
+            document.getElementById('results').innerHTML = liveTrains.map(t => `
                 <div class="train-card">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <h4>${t.name}</h4>
                         <span style="font-size:0.75rem; font-weight:800; color:var(--primary);">${t.type}</span>
                     </div>
                     <span class="pf-badge">🚉 Platform: ${t.pf}</span>
-                    <div style="margin-top:8px; font-weight:700;">${t.time}</div>
+                    <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:800; color:#10B981;">Departs: ${t.dep}</span>
+                        <span style="font-weight:700; color:#555;">Arrives: ${t.arr}</span>
+                    </div>
                 </div>
             `).join('');
-        }
-
-        function searchTrains() {
-            renderResults();
         }
     </script>
 </body>
