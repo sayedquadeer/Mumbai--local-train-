@@ -3,21 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mumbai Local Train Timetable, Timings, Routes & Journey Planner</title>
-    <meta name="title" content="Mumbai Local Train Timetable, Timings, Routes & Journey Planner">
-    <meta name="description" content="Find Mumbai local train timetable, Western, Central, Harbour & Trans-Harbour line timings, platform numbers, fast/slow train routes, and journey planner instantly.">
+    <title>Mumbai Local Train Timetable, Timings, Platform & Journey Planner</title>
+    <meta name="title" content="Mumbai Local Train Timetable, Timings, Platform & Journey Planner">
+    <meta name="description" content="Check Mumbai local train timetable, Western, Central, Harbour & Trans-Harbour line timings, platform numbers, fast/slow train routes, and journey planner instantly.">
     
-    <!-- Full Long-Tail & High Volume SEO Keywords -->
-    <meta name="keywords" content="mumbai local train timetable, local train timings today, central line train schedule, western line train timetable, harbour line train map, dadar to kalyan train time, churchgate to borivali fast train, csmt to panvel train timing, ac local train schedule, train running status mumbai, next local train from thane, fast local train stops, local train route map">
+    <!-- SEO Long-Tail Keywords -->
+    <meta name="keywords" content="mumbai local train timetable, local train timings, platform numbers mumbai local, central line schedule, western line timetable, harbour line map, dadar to kalyan train platform, csmt to borivali train timing, ac local train schedule">
     <meta name="robots" content="index, follow">
-    
-    <!-- Open Graph / Social Sharing Tags -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Mumbai Local Train Timetable & Journey Planner">
-    <meta property="og:description" content="Find fast & slow local trains across Central, Western, Harbour & Trans-Harbour lines with live route tracking.">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=1200&q=630">
-    
-    <!-- Google Fonts -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -94,7 +87,7 @@
 
         .nav-links {
             display: flex;
-            gap: 20px;
+            gap: 16px;
             list-style: none;
         }
 
@@ -102,17 +95,12 @@
             color: rgba(255, 255, 255, 0.9);
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.9rem;
-            transition: color 0.2s ease;
-        }
-
-        .nav-links a:hover {
-            color: var(--white);
+            font-size: 0.85rem;
         }
 
         /* Hero */
         .hero {
-            background: linear-gradient(135deg, rgba(23, 20, 43, 0.85) 0%, rgba(108, 77, 255, 0.8) 100%),
+            background: linear-gradient(135deg, rgba(23, 20, 43, 0.88) 0%, rgba(108, 77, 255, 0.85) 100%),
                         url('https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
             padding: 40px 0 80px;
             color: var(--white);
@@ -135,15 +123,13 @@
         .hero p {
             font-size: 0.95rem;
             color: rgba(255, 255, 255, 0.9);
-            max-width: 550px;
-            margin: 0 auto;
         }
 
         /* Search Card Mobile Optimized Layout */
         .search-card-wrapper {
             margin-top: -50px;
             position: relative;
-            z-index: 10;
+            z-index: 100;
         }
 
         .search-card {
@@ -192,7 +178,6 @@
             font-weight: 600;
             outline: none;
             background: #FAFAFA;
-            transition: all 0.2s ease;
         }
 
         .input-field:focus {
@@ -216,18 +201,18 @@
             align-self: center;
         }
 
-        /* Autocomplete Suggestions Popup */
+        /* Autocomplete Suggestions Popup - Fixed Visibilty */
         .autocomplete-dropdown {
             position: absolute;
             top: 100%;
             left: 0;
             right: 0;
-            background: var(--white);
-            border: 1px solid var(--primary);
+            background: #FFFFFF;
+            border: 2px solid var(--primary);
             border-radius: var(--radius-sm);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            z-index: 1000;
-            max-height: 250px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            z-index: 9999;
+            max-height: 220px;
             overflow-y: auto;
             margin-top: 4px;
             display: none;
@@ -236,18 +221,16 @@
         .autocomplete-item {
             padding: 12px 16px;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 0.9rem;
             border-bottom: 1px solid #F3F4F6;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            color: var(--text-dark);
         }
 
-        .autocomplete-item:last-child {
-            border-bottom: none;
-        }
-
-        .autocomplete-item:hover, .autocomplete-item.active {
+        .autocomplete-item:hover {
             background-color: var(--bg-main);
             color: var(--primary);
         }
@@ -258,7 +241,6 @@
             font-weight: 800;
         }
 
-        /* Prominent Search Button */
         .search-submit-btn {
             width: 100%;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -270,21 +252,16 @@
             font-weight: 800;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(108, 77, 255, 0.4);
-            margin-top: 6px;
+            margin-top: 12px;
         }
 
-        /* Section Layouts */
         .section-title {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 800;
             margin: 32px 0 16px;
             color: var(--text-dark);
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        /* Line Selector */
         .line-tabs {
             display: flex;
             gap: 8px;
@@ -336,7 +313,6 @@
             color: var(--white);
         }
 
-        /* Results Display Cards */
         .results-container {
             display: grid;
             gap: 14px;
@@ -364,6 +340,17 @@
             font-weight: 800;
             color: var(--white);
             text-transform: uppercase;
+        }
+
+        .platform-tag {
+            background: #FEF3C7;
+            color: #D97706;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            display: inline-block;
+            margin-top: 4px;
         }
 
         .bg-fast { background-color: var(--fast-tag); }
@@ -411,7 +398,6 @@
             color: var(--primary);
         }
 
-        /* Journey Planner Route Timeline */
         .route-planner-card {
             background: var(--white);
             border-radius: var(--radius-md);
@@ -458,7 +444,7 @@
 
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 12px;
         }
 
@@ -474,7 +460,6 @@
             border-color: var(--primary);
         }
 
-        /* Footer */
         footer {
             background: var(--text-dark);
             color: var(--white);
@@ -487,7 +472,6 @@
 </head>
 <body>
 
-    <!-- Header Section -->
     <header>
         <div class="container header-content">
             <a href="#" class="logo">🚆 Mumbai Local</a>
@@ -501,7 +485,6 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
     <section class="hero">
         <div class="container">
             <h1>मुंबई Local Train Timetable</h1>
@@ -510,29 +493,24 @@
         </div>
     </section>
 
-    <!-- Main Search Card -->
     <div class="container search-card-wrapper" id="search-section">
         <div class="search-card">
             <div class="search-grid">
                 
-                <!-- FROM FIELD -->
                 <div class="input-group">
                     <label for="from-station">FROM STATION</label>
-                    <input type="text" id="from-station" class="input-field" placeholder="Type station (e.g. Thane, Dadar)..." autocomplete="off">
+                    <input type="text" id="from-station" class="input-field" placeholder="Type station (e.g. CSMT, Thane)..." autocomplete="off">
                     <div id="from-dropdown" class="autocomplete-dropdown"></div>
                 </div>
 
-                <!-- SWAP BUTTON -->
                 <button class="swap-btn" id="swap-btn" title="Swap Stations">⇅</button>
 
-                <!-- TO FIELD -->
                 <div class="input-group">
                     <label for="to-station">TO STATION</label>
-                    <input type="text" id="to-station" class="input-field" placeholder="Type station (e.g. CSMT, Borivali)..." autocomplete="off">
+                    <input type="text" id="to-station" class="input-field" placeholder="Type station (e.g. Dadar, Kalyan)..." autocomplete="off">
                     <div id="to-dropdown" class="autocomplete-dropdown"></div>
                 </div>
 
-                <!-- TIME FIELD -->
                 <div class="input-group">
                     <label for="time-select">TRAIN TIME</label>
                     <select id="time-select" class="input-field">
@@ -544,7 +522,6 @@
                     </select>
                 </div>
 
-                <!-- UNTIL FIELD -->
                 <div class="input-group">
                     <label for="until-select">UNTIL TIME</label>
                     <select id="until-select" class="input-field">
@@ -556,15 +533,12 @@
 
             </div>
 
-            <!-- Prominent Search Button -->
             <button class="search-submit-btn" id="find-trains-btn">Find Trains</button>
         </div>
     </div>
 
-    <!-- Main Content -->
     <main class="container">
 
-        <!-- Line Selector Section -->
         <section id="lines-section">
             <h3 class="section-title">Select Your Line</h3>
             <div class="line-tabs" id="line-tabs">
@@ -576,29 +550,23 @@
             <div class="station-chips" id="station-chips"></div>
         </section>
 
-        <!-- Train Results -->
         <section id="results-section">
             <h3 class="section-title">Available Trains</h3>
-            <div class="results-container" id="train-results">
-                <!-- Dynamically Inserted -->
-            </div>
+            <div class="results-container" id="train-results"></div>
         </section>
 
-        <!-- Journey Planner -->
         <section id="journey-planner">
             <h3 class="section-title">Plan Your Journey</h3>
             <div class="route-planner-card" id="planner-output">
-                <p style="color: var(--text-muted);">Enter "From" and "To" stations above and click "Find Trains" to map your route and interchange details automatically.</p>
+                <p style="color: var(--text-muted);">Enter "From" and "To" stations above and click "Find Trains" to map your route, platforms, and interchange details automatically.</p>
             </div>
         </section>
 
-        <!-- Popular Routes -->
         <section id="popular-routes">
             <h3 class="section-title">Popular Routes</h3>
             <div class="cards-grid" id="popular-routes-grid"></div>
         </section>
 
-        <!-- FAQ Section -->
         <section id="faq">
             <h3 class="section-title">Frequently Asked Questions</h3>
             <div class="route-planner-card">
@@ -615,8 +583,21 @@
         </div>
     </footer>
 
-    <!-- JavaScript Data Architecture & App Logic -->
     <script>
         const stationData = {
             central: ["CSMT", "Masjid", "Sandhurst Road", "Byculla", "Chinchpokli", "Currey Road", "Parel", "Dadar", "Matunga", "Sion", "Kurla", "Vidyavihar", "Ghatkopar", "Vikhroli", "Kanjurmarg", "Bhandup", "Nahur", "Mulund", "Thane", "Kalva", "Mumbra", "Diva", "Kopar", "Dombivli", "Thakurli", "Kalyan", "Vitthalwadi", "Ulhasnagar", "Ambernath", "Badlapur", "Karjat", "Kasara"],
-            western: ["Churchgate", "Marine Lines", "Charni Road", "Grant Road", "Mumbai Central", "Mahalakshmi", "Lower Parel", "Prabhadevi", "Dadar", "M
+            western: ["Churchgate", "Marine Lines", "Charni Road", "Grant Road", "Mumbai Central", "Mahalakshmi", "Lower Parel", "Prabhadevi", "Dadar", "Matunga Road", "Mahim", "Bandra", "Khar Road", "Santacruz", "Vile Parle", "Andheri", "Jogeshwari", "Ram Mandir", "Goregaon", "Malad", "Kandivali", "Borivali", "Dahisar", "Mira Road", "Bhayandar", "Naigaon", "Vasai Road", "Nallasopara", "Virar", "Dahanu Road"],
+            harbour: ["CSMT", "Masjid", "Sandhurst Road", "Dockyard Road", "Reay Road", "Cotton Green", "Sewri", "Wadala Road", "GTB Nagar", "Chunabhatti", "Kurla", "Tilak Nagar", "Chembur", "Govandi", "Mankhurd", "Vashi", "Sanpada", "Juinagar", "Nerul", "Belapur", "Kharghar", "Panvel"],
+            transHarbour: ["Thane", "Airoli", "Rabale", "Ghansoli", "Koparkhairane", "Turbhe", "Juinagar", "Nerul", "Belapur", "Vashi"]
+        };
+
+        const allStations = [...new Set([
+            ...stationData.central,
+            ...stationData.western,
+            ...stationData.harbour,
+            ...stationData.transHarbour
+        ])].sort();
+
+        const trainSchedules = [
+            { id: "C01", name: "CSMT - Kalyan Fast", line: "central", type: "Fast", status: "On Time", platform: "PF No. 5", stops: 8, schedule: [{ station: "CSMT", time: "09:10 AM" }, { station: "Dadar", time: "09:22 AM" }, { station: "Kurla", time: "09:30 AM" }, { station: "Ghatkopar", time: "09:36 AM" }, { station: "Thane", time: "09:52 AM" }, { station: "Dombivli", time: "10:08 AM" }, { station: "Kalyan", time: "10:18 AM" }] },
+            { id: "C02", name: "CSMT - Thane Slow", line: "central", type: "Slow", status: "On Time", platf
